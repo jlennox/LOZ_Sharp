@@ -4,6 +4,8 @@ This is a C# port of Aldo Nunez's excellent Legend of Zelda port based on their 
 - [C++ port](https://github.com/aldonunez/Loz_enhanced/tree/master)
 - [Disassembly of NES code](https://github.com/aldonunez/zelda1-disassembly)
 
+This contains no copyrighted material. A dump of the NES game must be provided for the game assets to be used from.
+
 How to use
 ===
 - Place the American PRG0 Legend of Zelda ROM (`Legend of Zelda, The (U) (PRG0) [!].nes`) in the same directory as the .exe
