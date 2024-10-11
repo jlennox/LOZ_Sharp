@@ -54,10 +54,10 @@ internal abstract class BlockObjBase : Actor, IBlocksPlayer
 {
     private static readonly DebugLog _log = new(nameof(BlockObjBase));
 
-    public int Timer;
-    public int TargetPos;
-    public int OrigX;
-    public int OrigY;
+    private int _timer;
+    private int _targetPos;
+    private int _origX;
+    private int _origY;
 
     private Action? _curUpdate;
 
@@ -121,13 +121,11 @@ internal abstract class BlockObjBase : Actor, IBlocksPlayer
         }
 
         var player = Game.Link;
-        if (player == null) return;
-
         var dir = player.MovingDirection;
 
         if (!AllowHorizontal && dir.IsHorizontal())
         {
-            Timer = 0;
+            _timer = 0;
             return;
         }
 
@@ -140,26 +138,26 @@ internal abstract class BlockObjBase : Actor, IBlocksPlayer
 
         if (!pushed)
         {
-            Timer = 0;
+            _timer = 0;
             return;
         }
 
-        Timer++;
-        if (Timer == TimerLimit)
+        _timer++;
+        if (_timer == TimerLimit)
         {
-            TargetPos = dir switch
+            _targetPos = dir switch
             {
                 Direction.Right => X + World.MobTileWidth,
                 Direction.Left => X - World.MobTileWidth,
                 Direction.Down => Y + World.MobTileHeight,
                 Direction.Up => Y - World.MobTileHeight,
-                _ => TargetPos
+                _ => _targetPos
             };
             Game.World.SetMobXY(X, Y, FloorMob1);
             Facing = dir;
-            OrigX = X;
-            OrigY = Y;
-            _log.Write(nameof(CheckCollision), $"Moving {X:X2},{Y:X2} TargetPos:{TargetPos}, dir:{dir}");
+            _origX = X;
+            _origY = Y;
+            _log.Write(nameof(CheckCollision), $"Moving {X:X2},{Y:X2} TargetPos:{_targetPos}, dir:{dir}");
             _curUpdate = UpdateMoving;
         }
     }
@@ -168,7 +166,7 @@ internal abstract class BlockObjBase : Actor, IBlocksPlayer
     {
         MoveDirection(0x20, Facing);
 
-        var done = Facing.IsHorizontal() ? X == TargetPos : Y == TargetPos;
+        var done = Facing.IsHorizontal() ? X == _targetPos : Y == _targetPos;
 
         _log.Write(nameof(UpdateMoving), $"{X:X2},{Y:X2} done:{done}");
 
@@ -176,7 +174,7 @@ internal abstract class BlockObjBase : Actor, IBlocksPlayer
         {
             Game.World.OnPushedBlock();
             Game.World.SetMobXY(X, Y, BlockMob);
-            Game.World.SetMobXY(OrigX, OrigY, FloorMob2);
+            Game.World.SetMobXY(_origX, _origY, FloorMob2);
             Delete();
         }
     }

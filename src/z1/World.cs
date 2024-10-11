@@ -284,8 +284,8 @@ internal sealed unsafe partial class World
     private readonly Cell[] _ghostCells = Cell.MakeMobPatchCell();
     private readonly Cell[] _armosCells = Cell.MakeMobPatchCell();
 
-    private UWRoomAttrs CurrentUWRoomAttrs => GetUWRoomAttrs(CurRoomId);
-    private OWRoomAttrs CurrentOWRoomAttrs => GetOWRoomAttrs(CurRoomId);
+    public UWRoomAttrs CurrentUWRoomAttrs => GetUWRoomAttrs(CurRoomId);
+    public OWRoomAttrs CurrentOWRoomAttrs => GetOWRoomAttrs(CurRoomId);
 
     private UWRoomAttrs GetUWRoomAttrs(int roomId) => _roomAttrs[roomId];
     private OWRoomAttrs GetOWRoomAttrs(int roomId) => _roomAttrs[roomId];
@@ -556,7 +556,7 @@ internal sealed unsafe partial class World
             var foundSecret = i switch
             {
                 0 => Profile.Quest == 0,
-                > 1 => Profile.Quest != 0,
+                > 0 => Profile.Quest != 0,
                 _ => false
             };
 
@@ -1366,8 +1366,7 @@ internal sealed unsafe partial class World
     {
         if (TryFindEmptyMonsterSlot(out var slot))
         {
-            _objects[(int)slot] = GlobalFunctions.MakeItem(
-                Game, itemId, Game.Link.X, Game.Link.Y - TileHeight, false);
+            _objects[(int)slot] = GlobalFunctions.MakeItem(Game, itemId, Game.Link.X, Game.Link.Y - TileHeight, false);
             return slot;
         }
 
@@ -2000,11 +1999,16 @@ internal sealed unsafe partial class World
 
         if (_pause == PauseState.Unpaused)
         {
-            if (Game.Enhancements.ImprovedMenus)
-            {
-                if (IsButtonPressing(GameButton.ItemNext)) Menu.SelectNextItem();
-                if (IsButtonPressing(GameButton.ItemPrevious)) Menu.SelectPreviousItem();
-            }
+            if (IsButtonPressing(GameButton.ItemNext)) Menu.SelectNextItem();
+            if (IsButtonPressing(GameButton.ItemPrevious)) Menu.SelectPreviousItem();
+            if (IsButtonPressing(GameButton.ItemBoomerang)) Menu.SelectItem(ItemSlot.Boomerang);
+            if (IsButtonPressing(GameButton.ItemBombs)) Menu.SelectItem(ItemSlot.Bombs);
+            if (IsButtonPressing(GameButton.ItemArrow)) Menu.SelectItem(ItemSlot.Arrow);
+            if (IsButtonPressing(GameButton.ItemCandle)) Menu.SelectItem(ItemSlot.Candle);
+            if (IsButtonPressing(GameButton.ItemRecorder)) Menu.SelectItem(ItemSlot.Recorder);
+            if (IsButtonPressing(GameButton.ItemFood)) Menu.SelectItem(ItemSlot.Food);
+            if (IsButtonPressing(GameButton.ItemLetter)) Menu.SelectItem(ItemSlot.Letter);
+            if (IsButtonPressing(GameButton.ItemRod)) Menu.SelectItem(ItemSlot.Rod);
 
             if (IsAnyButtonPressing(GameButton.Select, GameButton.Pause))
             {

@@ -87,6 +87,7 @@ internal sealed class DebugInfoConfiguration
     public bool Enabled { get; set; }
     public bool RoomId { get; set; }
     public bool ActiveShots { get; set; }
+    public bool RoomAttributes { get; set; }
 
     public static DebugInfoConfiguration MakeDefaults() => new();
 
@@ -225,6 +226,15 @@ internal sealed class InputConfiguration
         { new KeyboardMapping(Key.Minus), GameButton.AudioDecreaseVolume },
         { new KeyboardMapping(Key.Equal), GameButton.AudioIncreaseVolume },
         { new KeyboardMapping(Key.Equal, KeyboardModifiers.Shift), GameButton.AudioIncreaseVolume },
+
+        { new KeyboardMapping(Key.Number1), GameButton.ItemBoomerang },
+        { new KeyboardMapping(Key.Number2), GameButton.ItemBombs },
+        { new KeyboardMapping(Key.Number3), GameButton.ItemArrow },
+        { new KeyboardMapping(Key.Number4), GameButton.ItemCandle },
+        { new KeyboardMapping(Key.Number5), GameButton.ItemRecorder },
+        { new KeyboardMapping(Key.Number6), GameButton.ItemFood },
+        { new KeyboardMapping(Key.Number7), GameButton.ItemLetter },
+        { new KeyboardMapping(Key.Number8), GameButton.ItemRod },
 
 #if DEBUG
         { new KeyboardMapping(Key.X, KeyboardModifiers.Control | KeyboardModifiers.Alt), GameButton.CheatKillAll },

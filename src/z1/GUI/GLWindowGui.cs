@@ -47,6 +47,7 @@ internal static class GLWindowGui
         public static readonly PropertyInfo Enabled = GetProperty(nameof(DebugInfoConfiguration.Enabled));
         public static readonly PropertyInfo RoomId = GetProperty(nameof(DebugInfoConfiguration.RoomId));
         public static readonly PropertyInfo ActiveShots  = GetProperty(nameof(DebugInfoConfiguration.ActiveShots));
+        public static readonly PropertyInfo RoomAttributes = GetProperty(nameof(DebugInfoConfiguration.RoomAttributes));
     }
 
     private readonly struct AudioConfigurationPassthrough
@@ -122,6 +123,7 @@ internal static class GLWindowGui
                     DrawMenuItem("Enabled", DebugInfoProperties.Enabled, game.Configuration.DebugInfo);
                     DrawMenuItem("Room Id", DebugInfoProperties.RoomId, game.Configuration.DebugInfo);
                     DrawMenuItem("Active Shots", DebugInfoProperties.ActiveShots, game.Configuration.DebugInfo);
+                    DrawMenuItem("Room Attributes", DebugInfoProperties.RoomAttributes, game.Configuration.DebugInfo);
                     ImGui.EndMenu();
                 }
                 ImGui.EndMenu();
@@ -160,7 +162,54 @@ internal static class GLWindowGui
                 ImGui.EndMenu();
             }
 
+            DrawWarpMenu(game);
+
             ImGui.EndMainMenuBar();
+        }
+    }
+
+    private static void DrawWarpMenu(Game game)
+    {
+#if !DEBUG
+        return;
+#endif
+
+        static void Warp(Game game, int levelNumber)
+        {
+            game.World.KillAllObjects();
+            game.World.GotoLoadLevel(levelNumber);
+        }
+
+        static void WarpOW(Game game, int x, int y)
+        {
+            game.World.KillAllObjects();
+            game.World.LoadOverworldRoom(x, y);
+        }
+
+        if (ImGui.BeginMenu("Warp"))
+        {
+            if (ImGui.MenuItem("Level 1")) Warp(game, 1);
+            if (ImGui.MenuItem("Level 2")) Warp(game, 2);
+            if (ImGui.MenuItem("Level 3")) Warp(game, 3);
+            if (ImGui.MenuItem("Level 4")) Warp(game, 4);
+            if (ImGui.MenuItem("Level 5")) Warp(game, 5);
+            if (ImGui.MenuItem("Level 6")) Warp(game, 6);
+            if (ImGui.MenuItem("Level 7")) Warp(game, 7);
+            if (ImGui.MenuItem("Level 8")) Warp(game, 8);
+            if (ImGui.MenuItem("Level 9")) Warp(game, 9);
+
+            if (game.World.IsOverworld())
+            {
+                ImGui.Separator();
+                if (ImGui.MenuItem("Raft")) WarpOW(game, 5, 5);
+                if (ImGui.MenuItem("Ghost")) WarpOW(game, 1, 2);
+                if (ImGui.MenuItem("Level 6 Entrance")) WarpOW(game, 2, 2);
+                if (ImGui.MenuItem("Bracelet")) WarpOW(game, 4, 2);
+                if (ImGui.MenuItem("Ladder")) WarpOW(game, 15, 5);
+                if (ImGui.MenuItem("Armos / Lost Hills")) WarpOW(game, 12, 1);
+            }
+
+            ImGui.EndMenu();
         }
     }
 }

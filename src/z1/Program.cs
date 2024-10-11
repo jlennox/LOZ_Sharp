@@ -4,6 +4,9 @@
 
 namespace z1;
 
+// Major bugs:
+// * Patra can crash the game.
+
 // Milestone 1:
 // * Textbox and rupee sounds are wrong.
 // * Darknuts should make parry sound when shot with wave.

@@ -2646,8 +2646,8 @@ internal sealed class PatraActor : FlyingActor
     private const int PatraX = 0x80;
     private const int PatraY = 0x70;
 
-    private const ObjectSlot FirstChildSlot = ObjectSlot.Monster1;
-    private const ObjectSlot LastChildSlot = ObjectSlot.Monster9;
+    private const ObjectSlot FirstChildSlot = ObjectSlot.Monster2;
+    private const ObjectSlot LastChildSlot = ObjectSlot.Monster10;
 
     private static readonly ImmutableArray<AnimationId> _patraAnimMap = [
         AnimationId.B3_Patra,

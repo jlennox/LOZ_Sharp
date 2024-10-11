@@ -295,7 +295,7 @@ internal sealed class GameCheats
             game.World.AddItem(ItemId.MagicSword);
             game.World.AddItem(ItemId.HeartContainer);
             game.World.SetItem(ItemSlot.TriforcePieces, 0xFF);
-            game.World.PostRupeeWin(0xFF);
+            profile.Items[ItemSlot.Rupees] += 100;
             profile.Items[ItemSlot.Bombs] = 98;
             profile.Items[ItemSlot.Keys] = 98;
             profile.Items[ItemSlot.HeartContainers] = 16;

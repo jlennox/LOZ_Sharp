@@ -196,15 +196,13 @@ internal sealed class StatusBar
     {
         var y = MiniMapY + baseY;
 
-        for (var i = 0; i < 4; i++)
+        for (var yi = 0; yi < 4; yi++, y += 8)
         {
             var x = MiniMapX;
-            for (var j = 0; j < 8; j++)
+            for (var xi = 0; xi < 8; xi++, x += 8)
             {
                 DrawTile(0xF5, x, y, 0);
-                x += 8;
             }
-            y += 8;
         }
     }
 
@@ -213,24 +211,21 @@ internal sealed class StatusBar
         if (!_world.HasCurrentMap()) return;
 
         var levelInfo = _world.GetLevelInfo();
-
         var x = MiniMapX;
 
-        for (var c = 0; c < 12; c++)
+        for (var xi = 0; xi < 8; xi++, x += 8)
         {
-            int b = levelInfo.DrawnMap[c + MiniMapColumnOffset];
             var y = baseY + MiniMapY;
 
-            for (var r = 0; r < 8; r++)
+            for (var yi = 0; yi < 8; yi++, y += 4)
             {
+                int b = levelInfo.DrawnMap[xi + MiniMapColumnOffset] << yi;
                 if ((b & 0x80) != 0)
                 {
                     Graphics.DrawTile(TileSheet.Font, 0x7 * 8, 0x6 * 8, 8, 4, x, y, 0, 0);
                 }
                 b <<= 1;
-                y += 4;
             }
-            x += 8;
         }
     }
 

@@ -303,6 +303,24 @@ internal sealed class SubmenuType
         profile.SelectedItem = _activeSlots[_activeUISlot];
     }
 
+    public void SelectItem(ItemSlot slot)
+    {
+        UpdateActiveItems();
+
+        var index = _inventoryOrder.IndexOf(slot);
+        if (index == -1)
+        {
+            return;
+        }
+
+        if (_activeItems[index] != ItemId.None)
+        {
+            _activeUISlot = index;
+            var profile = _game.World.Profile;
+            profile.SelectedItem = _activeSlots[_activeUISlot];
+        }
+    }
+
     public void SelectPreviousItem() => SelectNextItem(-1);
 
     public void SelectNextItem(int xdir = 1)
@@ -539,8 +557,9 @@ internal sealed class SubmenuType
             {
                 var roomId = (r << 4) | (c - levelInfo.DrawnMapOffset + 0x10 + 4) & 0xF;
                 var roomFlags = _game.World.GetRoomFlags(roomId);
-                byte  tile = 0xF5;
-                if ((mapMaskByte & 0x80) == 0x80 && roomFlags.VisitState)
+                byte tile = 0xF5;
+                var shownOnMap = (mapMaskByte & 0x80) == 0x80;
+                if (shownOnMap && roomFlags.VisitState)
                 {
                     var doorSum = 0;
                     var doorBit = 8;
