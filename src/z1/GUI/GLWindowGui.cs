@@ -143,6 +143,22 @@ internal static class GLWindowGui
                 ImGui.EndMenu();
             }
 
+            if (ImGui.BeginMenu("Debug"))
+            {
+                if (ImGui.MenuItem("Reset all"))
+                {
+                    foreach (var flags in game.World.Profile.RoomFlags)
+                    {
+                        flags.ShortcutState = false;
+                        flags.ItemState = false;
+                        flags.SecretState = false;
+                        flags.ObjectCount = 0;
+                    }
+                }
+
+                ImGui.EndMenu();
+            }
+
             if (ImGui.BeginMenu("Enhancements"))
             {
                 DrawMenuItem("AutoSave", GameEnhancementsProperties.AutoSave, game.Enhancements);
@@ -152,13 +168,20 @@ internal static class GLWindowGui
 
                 var speed = game.Enhancements.TextSpeed;
                 if (ImGui.SliderInt("Text Speed", ref speed,
-                    GameEnhancements.TextSpeedMin,
-                    GameEnhancements.TextSpeedMax))
+                        GameEnhancements.TextSpeedMin,
+                        GameEnhancements.TextSpeedMax))
                 {
                     game.Enhancements.TextSpeed = speed;
                     SaveFolder.SaveConfiguration();
                 }
 
+                ImGui.EndMenu();
+            }
+
+            if (ImGui.BeginMenu("Debug"))
+            {
+                if (ImGui.MenuItem("Clear history")) game.GameCheats.TriggerCheat<GameCheats.ClearHistoryCheat>();
+                if (ImGui.MenuItem("Draw hit detection", null, game.World.DrawHitDetection)) game.World.DrawHitDetection = !game.World.DrawHitDetection;
                 ImGui.EndMenu();
             }
 
@@ -189,12 +212,15 @@ internal static class GLWindowGui
         if (ImGui.BeginMenu("Warp"))
         {
             if (ImGui.MenuItem("Level 1")) Warp(game, 1);
+            if (ImGui.MenuItem("Level 1 (Entrance)")) WarpOW(game, 7, 3);
             if (ImGui.MenuItem("Level 2")) Warp(game, 2);
             if (ImGui.MenuItem("Level 3")) Warp(game, 3);
             if (ImGui.MenuItem("Level 4")) Warp(game, 4);
             if (ImGui.MenuItem("Level 5")) Warp(game, 5);
             if (ImGui.MenuItem("Level 6")) Warp(game, 6);
+            if (ImGui.MenuItem("Level 6 (Entrance)")) WarpOW(game, 2, 2);
             if (ImGui.MenuItem("Level 7")) Warp(game, 7);
+            if (ImGui.MenuItem("Level 7 (Entrance)")) WarpOW(game, 2, 4);
             if (ImGui.MenuItem("Level 8")) Warp(game, 8);
             if (ImGui.MenuItem("Level 9")) Warp(game, 9);
 
@@ -203,10 +229,10 @@ internal static class GLWindowGui
                 ImGui.Separator();
                 if (ImGui.MenuItem("Raft")) WarpOW(game, 5, 5);
                 if (ImGui.MenuItem("Ghost")) WarpOW(game, 1, 2);
-                if (ImGui.MenuItem("Level 6 Entrance")) WarpOW(game, 2, 2);
-                if (ImGui.MenuItem("Bracelet")) WarpOW(game, 4, 2);
-                if (ImGui.MenuItem("Ladder")) WarpOW(game, 15, 5);
-                if (ImGui.MenuItem("Armos / Lost Hills")) WarpOW(game, 12, 1);
+                if (ImGui.MenuItem("Armos / Bracelet")) WarpOW(game, 4, 2);
+                if (ImGui.MenuItem("Ladder / Heart")) WarpOW(game, 15, 5);
+                if (ImGui.MenuItem("Cave 12: Lost hills hint")) WarpOW(game, 0, 7);
+                if (ImGui.MenuItem("Cave 15: Shop")) WarpOW(game, 6, 6);
             }
 
             ImGui.EndMenu();

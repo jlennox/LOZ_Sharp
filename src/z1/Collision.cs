@@ -81,3 +81,25 @@ internal enum TileBehavior : byte
     FirstWalkable = GenericWalkable,
     FirstSolid = Doorway,
 }
+
+
+
+internal enum TileBehaviorSharper : byte
+{
+    GenericWalkable,
+    Sand,
+    SlowStairs,
+    Stairs,
+
+    Doorway,
+    Water,
+    GenericSolid,
+    Cave,
+    Door,
+    Wall,
+
+    Max,
+
+    FirstWalkable = GenericWalkable,
+    FirstSolid = Doorway,
+}
