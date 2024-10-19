@@ -3818,7 +3818,7 @@ internal sealed class RedWizzrobeActor : WizzrobeBase
             Facing = _wizzrobeDirs[dirOrd];
 
             X = (player.X + _wizzrobeXOffsets[r]) & 0xF0;
-            Y = (player.Y + _wizzrobeYOffsets[r] + 3) & 0xF0 - 3;
+            Y = ((player.Y + _wizzrobeYOffsets[r] + 3) & 0xF0) - 3;
 
             if (Y < 0x5D || Y >= 0xC4)
             {
