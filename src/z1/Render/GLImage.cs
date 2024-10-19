@@ -42,38 +42,38 @@ internal sealed unsafe class GLImage : IDisposable
     }
 
     public void Draw(
-        int srcx, int srcy, int width, int height,
-        int destinationx, int destinationy,
+        int srcX, int srcY, int width, int height,
+        int destX, int destY,
         ReadOnlySpan<SKColor> palette, DrawingFlags flags)
     {
         _gl.ActiveTexture(TextureUnit.Texture0);
         _gl.BindTexture(TextureTarget.Texture2D, _texture);
 
-        var right = srcx + width;
-        var bottom = srcy + height;
+        var right = srcX + width;
+        var bottom = srcY + height;
 
         // Branchless conditional swaps:
         // https://github.com/jlennox/Benchmarks/blob/main/BranchlessSwap.cs
         var flipHor = -BitOperations.PopCount((uint)(flags & DrawingFlags.FlipHorizontal));
         var flipVert = -BitOperations.PopCount((uint)(flags & DrawingFlags.FlipVertical));
 
-        var tempSrcX = (flipHor & right) | (~flipHor & srcx);
-        var tempRight = (flipHor & srcx) | (~flipHor & right);
-        srcx = tempSrcX;
+        var tempSrcX = (flipHor & right) | (~flipHor & srcX);
+        var tempRight = (flipHor & srcX) | (~flipHor & right);
+        srcX = tempSrcX;
         right = tempRight;
 
-        var tempSrcY = (flipVert & bottom) | (~flipVert & srcy);
-        var tempBottom = (flipVert & srcy) | (~flipVert & bottom);
-        srcy = tempSrcY;
+        var tempSrcY = (flipVert & bottom) | (~flipVert & srcY);
+        var tempBottom = (flipVert & srcY) | (~flipVert & bottom);
+        srcY = tempSrcY;
         bottom = tempBottom;
 
         // Really, all the rendering should be batched together. But Zelda is simple enough
         // that it's not really a performance concern.
         ReadOnlySpan<Point> verticies = stackalloc Point[] {
-            new Point(srcx, srcy), new Point(destinationx, destinationy),
-            new Point(srcx, bottom), new Point(destinationx, destinationy + height),
-            new Point(right, srcy), new Point(destinationx + width, destinationy),
-            new Point(right, bottom), new Point(destinationx + width, destinationy + height),
+            new Point(srcX, srcY), new Point(destX, destY),
+            new Point(srcX, bottom), new Point(destX, destY + height),
+            new Point(right, srcY), new Point(destX + width, destY),
+            new Point(right, bottom), new Point(destX + width, destY + height),
         };
 
         var finalPalette = palette;

@@ -1149,11 +1149,7 @@ internal sealed unsafe partial class World
 
         if (DrawHitDetection)
         {
-            // _colCount = 32;
-            // _rowCount = 22;
-            // _startRow = 0;
-            // _startCol = 0;
-            // _tileTypeCount = 56;
+            // This is for the local values only, it's intended to make the drawing also draw the hit detection for walls.
             startRow = 0;
             endCol = 32;
             endRow = 22;

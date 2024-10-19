@@ -14,7 +14,7 @@ internal enum ObjectSlot
     Monster9,
     Monster10, // 9
     Monster11 = Monster1 + 10,
-    Buffer,
+    Buffer, // used by block actors.
     PlayerSword,
     PlayerSwordShot,
     Boomerang,

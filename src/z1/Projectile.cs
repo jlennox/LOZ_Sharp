@@ -677,7 +677,7 @@ internal sealed class MagicWaveProjectile : Projectile, IBlockableProjectile
 
     private void UpdateFlying()
     {
-        if (Direction.None == CheckWorldMargin(Facing))
+        if (CheckWorldMargin(Facing) == Direction.None)
         {
             if (IsPlayerWeapon && !Game.World.IsOverworld())
             {
