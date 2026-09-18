@@ -2203,10 +2203,12 @@ internal abstract class FlyingActor : Actor
 
     private void UpdateSlowing()
     {
+        // Flyer_SlowDown stops at the first speed whose high bits are clear and leaves it there,
+        // which is $1F -- the same value flyers are initialized with. Zeroing it instead would add
+        // another $20 frames of standing still before the flyer gets moving again.
         CurSpeed--;
         if ((CurSpeed & 0xE0) <= 0)
         {
-            CurSpeed = 0;
             State = FlyingActorState.Still;
             ObjTimer = (byte)(Random.Shared.Next(64) + 64);
         }
