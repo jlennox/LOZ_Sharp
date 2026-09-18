@@ -277,6 +277,12 @@ internal sealed unsafe partial class World
     private bool _giveFakePlayerPos;
     private Point _fakePlayerPos;
 
+    // The original updates the player's weapon and item slots in ascending order ($0D sword,
+    // $0E sword shot, $0F boomerang/food, $10 and $11 bomb-or-fire, $12 rod/arrow), and only then
+    // walks the monster and tile-object slots from $B down to 1. The slots that have no original
+    // counterpart keep their old descending position ahead of the weapons.
+    private static readonly int[] _objectUpdateOrder = BuildObjectUpdateOrder();
+
     private readonly Actor?[] _objects = new Actor[(int)ObjectSlot.MaxObjects];
     private readonly Queue<Actor> _objectsToDelete = new();
     private readonly int[] _objectTimers = new int[(int)ObjectSlot.MaxObjects];
@@ -627,6 +633,33 @@ internal sealed unsafe partial class World
             _state.Play.AnimatingRoomColors = true;
             _state.Play.Timer = 88;
         }
+    }
+
+    private static int[] BuildObjectUpdateOrder()
+    {
+        var order = new List<int>((int)ObjectSlot.MaxObjects);
+
+        for (var slot = (int)ObjectSlot.MaxObjects - 1; slot > (int)ObjectSlot.Arrow; slot--)
+        {
+            order.Add(slot);
+        }
+
+        for (var slot = (int)ObjectSlot.PlayerSword; slot <= (int)ObjectSlot.Arrow; slot++)
+        {
+            order.Add(slot);
+        }
+
+        for (var slot = (int)ObjectSlot.Buffer; slot >= (int)ObjectSlot.Monster1; slot--)
+        {
+            order.Add(slot);
+        }
+
+        if (order.Count != (int)ObjectSlot.MaxObjects)
+        {
+            throw new InvalidOperationException($"Object update order covers {order.Count} of {(int)ObjectSlot.MaxObjects} slots.");
+        }
+
+        return order.ToArray();
     }
 
     private TileBehavior GetTileBehavior(int row, int col)
@@ -2100,8 +2133,10 @@ internal sealed unsafe partial class World
 
         UpdateObservedPlayerPos();
 
-        for (CurObjSlot = (int)ObjectSlot.MaxObjects - 1; CurObjSlot >= 0; CurObjSlot--)
+        foreach (var slot in _objectUpdateOrder)
         {
+            CurObjSlot = slot;
+
             var obj = _objects[CurObjSlot];
             if (obj != null && !obj.IsDeleted)
             {
