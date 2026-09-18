@@ -78,7 +78,6 @@ internal abstract class WalkerActor : Actor
     {
         if (!HasProjectile) return;
 
-        // _TryShooting compares a full random byte against $F8, so 8 values in 256 pass.
         if (ObjType.IsBlueWalker() || ShootTimer != 0 || Random.Shared.GetByte() >= 0xF8)
         {
             if (InvincibilityTimer > 0)
@@ -1467,8 +1466,6 @@ internal sealed class ZolActor : WandererWalkerActor
 
     private void UpdateSplit()
     {
-        // UpdateZolState2_Split picks Left or Up for the first gel and derives the second with a
-        // shift right, giving Left then Right, or Up then Down.
         ReadOnlySpan<Direction> sHDirs = [Direction.Left, Direction.Right];
         ReadOnlySpan<Direction> sVDirs = [Direction.Up, Direction.Down];
 
@@ -1641,7 +1638,6 @@ internal sealed class LikeLikeActor : WandererWalkerActor
         AnimationId.UW_LikeLike
     ];
 
-    // 4 frames at 8 screen frames each; UpdateLikeLike reloads the animation counter with $08.
     private static readonly WalkerSpec _likeLikeSpec = new(_likeLikeAnimMap, 32, Palette.Red, StandardSpeed);
 
     private static readonly DebugLog _log = new(nameof(LikeLikeActor));
@@ -4361,7 +4357,6 @@ internal sealed class AquamentusActor : Actor
             var r = Random.Shared.GetByte();
             ObjTimer = (byte)(r | 0x70);
 
-            // Aquamentus_Shoot makes the middle fireball first, then the lower one, then the upper.
             ReadOnlySpan<int> yOffsets = [0, 1, -1];
 
             for (var i = 0; i < 3; i++)
@@ -5575,7 +5570,6 @@ internal sealed class GoriyaActor : ChaseWalkerActor, IThrower
             }
         }
 
-        // UpdateGoriya gates this on the magic clock *and* the stun timer.
         if (IsStunned) return;
 
         var shot = Shoot(ObjType.Boomerang);

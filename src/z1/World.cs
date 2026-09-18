@@ -673,6 +673,26 @@ internal sealed unsafe partial class World
         return _tileMaps[_curTileMapIndex].AsRefs(row, col);
     }
 
+    /// <summary>
+    /// Looks up a play-area tile the way the original's column addressing does. Its buffer is
+    /// column-major with <see cref="Rows"/> bytes per column, so a row index past the end of one
+    /// column reads into the next: row 31 of column c is row 9 of column c + 1. Only a hotspot
+    /// outside the play area produces such a row, and no caller acts on the answer -- each pairs
+    /// the tile test with a room-bound check that rejects the direction regardless -- but reading
+    /// where the original reads beats substituting an answer of our own.
+    /// </summary>
+    private TileBehavior GetPlayAreaTileBehavior(int fineRow, int fineCol)
+    {
+        var index = fineCol * Rows + fineRow;
+        var col = index / Rows;
+        var row = index % Rows;
+
+        // The original runs off the end of its buffer here and reads whatever variables follow it.
+        if (col >= Columns) return TileBehavior.GenericWalkable;
+
+        return GetTileBehavior(row, col);
+    }
+
     private TileBehavior GetTileBehaviorXY(int x, int y)
     {
         var col = x / TileWidth;
@@ -873,19 +893,12 @@ internal sealed unsafe partial class World
             }
         }
 
-        if (y < TileMapBaseY)
-        {
-            // JOE: FIXME: Arg. This is a bug in the original C++ but the original C++ is a proper translation
-            // from the assembly. I was unable to reproduce this issue in the original game, so it's either a
-            // logic change or an issue higher up.
-            y = TileMapBaseY;
-
-            // throw new Exception("I think this bad.");
-            // Debugger.Break();
-        }
-
+        // GetCollidableTile subtracts the status bar height from an 8-bit Y, so a hotspot above the
+        // play area wraps rather than going negative: ($38 - $40) & $FF = $F8, >> 3 = row 31. That
+        // is reachable -- a monster spawned from the top edge of the screen starts at Y = $3D and
+        // can probe upward from there. See GetPlayAreaTileBehavior for where row 31 lands.
         var behavior = TileBehavior.FirstWalkable;
-        var fineRow = (byte)((y - TileMapBaseY) / 8);
+        var fineRow = (byte)((byte)(y - TileMapBaseY) / 8);
         var fineCol1 = (byte)(x / 8);
         var hitFineCol = fineCol1;
 
@@ -894,7 +907,7 @@ internal sealed unsafe partial class World
         // Upcast to an int, otherwise `fineCol2` being 0xFF will cause a non-terminating loop.
         for (var c = (int)fineCol1; c <= fineCol2; c++)
         {
-            var curBehavior = GetTileBehavior(fineRow, c);
+            var curBehavior = GetPlayAreaTileBehavior(fineRow, c);
             if (curBehavior == TileBehavior.Water && _state.Play.AllowWalkOnWater)
             {
                 curBehavior = TileBehavior.GenericWalkable;
