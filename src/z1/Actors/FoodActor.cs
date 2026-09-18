@@ -2,7 +2,11 @@
 
 internal sealed class FoodActor : Actor
 {
-    private int _periods;
+    // The original creates food in state $80 with a $FF timer, then advances the state on each
+    // expiry until state $83 deactivates it. That's three $FF periods, $2FD frames in total.
+    private const int PeriodCount = 3;
+
+    private int _periods = PeriodCount;
 
     public FoodActor(Game game, int x, int y) : base(game, ObjType.Food, x, y)
     {
