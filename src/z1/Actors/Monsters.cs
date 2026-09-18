@@ -5562,7 +5562,8 @@ internal sealed class GoriyaActor : ChaseWalkerActor, IThrower
             }
         }
 
-        if (Game.World.HasItem(ItemSlot.Clock)) return;
+        // UpdateGoriya gates this on the magic clock *and* the stun timer.
+        if (IsStunned) return;
 
         var shot = Shoot(ObjType.Boomerang);
         if (shot != ObjectSlot.NoneFound)
