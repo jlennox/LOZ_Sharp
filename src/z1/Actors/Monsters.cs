@@ -3623,7 +3623,10 @@ internal sealed class PolsVoiceActor : Actor
             _accelStep = 0;
             var r = Random.Shared.GetByte();
             Facing = (r & 3).GetOrdDirection();
-            _stateTimer = (r & 0x40) + 0x30;
+
+            // The original's "ADC #$30" runs with carry still set from the "CMP target / BCC"
+            // that got us here, so the walk lasts $31 or $71 frames rather than $30 or $70.
+            _stateTimer = (r & 0x40) + 0x31;
             X = (X + 8) & 0xF0;
             Y = (Y + 8) & 0xF0;
             Y -= 3;
