@@ -3263,13 +3263,15 @@ internal sealed class BouldersActor : Actor
 
 internal sealed class TrapActor : Actor
 {
+    // TrapXs/TrapYs in the original. Object Y coordinates carry the usual -3 offset, so the low
+    // nibble is $D, not 0.
     private static readonly ImmutableArray<Point> _trapPos = [
-        new Point(0x20, 0x60),
-        new Point(0x20, 0xC0),
-        new Point(0xD0, 0x60),
-        new Point(0xD0, 0xC0),
-        new Point(0x40, 0x90),
-        new Point(0xB0, 0x90)
+        new Point(0x20, 0x5D),
+        new Point(0x20, 0xBD),
+        new Point(0xD0, 0x5D),
+        new Point(0xD0, 0xBD),
+        new Point(0x40, 0x8D),
+        new Point(0xB0, 0x8D)
     ];
 
     private static readonly ImmutableArray<int> _trapAllowedDirs = [5, 9, 6, 0xA, 1, 2];
