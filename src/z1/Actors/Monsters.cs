@@ -3336,32 +3336,26 @@ internal sealed class TrapActor : Actor
         var distX = Math.Abs(playerX - X);
         var distY = Math.Abs(playerY - Y);
 
-        if (distY >= 0xE)
+        // The original only asks for the trap to be lined up on one axis; it puts no condition on
+        // the other. When the player is lined up horizontally but shares the trap's X, the
+        // horizontal test falls through to the vertical one instead of giving up.
+        if (distY < 0xE && playerX != X)
         {
-            if (distX < 0xE)
-            {
-                dir = playerY < Y ? Direction.Up : Direction.Down;
-                _origCoord = Y;
-            }
+            dir = playerX < X ? Direction.Left : Direction.Right;
+            _origCoord = X;
         }
-        else
+        else if (distX < 0xE && playerY != Y)
         {
-            if (distX >= 0xE)
-            {
-                dir = playerX < X ? Direction.Left : Direction.Right;
-                _origCoord = X;
-            }
+            dir = playerY < Y ? Direction.Up : Direction.Down;
+            _origCoord = Y;
         }
 
-        if (dir != Direction.None)
-        {
-            if ((dir & (Direction)_trapAllowedDirs[_trapIndex]) != 0)
-            {
-                Facing = dir;
-                _state++;
-                _speed = 0x70;
-            }
-        }
+        if (dir == Direction.None) return;
+        if ((dir & (Direction)_trapAllowedDirs[_trapIndex]) == 0) return;
+
+        Facing = dir;
+        _state++;
+        _speed = 0x70;
     }
 
     private void UpdateMoving()
