@@ -2677,6 +2677,9 @@ internal sealed class PatraActor : FlyingActor
         Facing = Direction.Up;
         CurSpeed = 0x1F;
 
+        // InitPatra arms this timer, so the first maneuver runs for its full length.
+        _childStateTimer = 0xFF;
+
         Game.Sound.PlayEffect(SoundEffect.BossRoar3, true, Sound.AmbientInstance);
 
         Array.Fill(PatraAngle, 0);
