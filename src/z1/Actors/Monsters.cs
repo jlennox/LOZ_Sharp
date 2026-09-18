@@ -4351,11 +4351,13 @@ internal sealed class AquamentusActor : Actor
             var r = Random.Shared.GetByte();
             ObjTimer = (byte)(r | 0x70);
 
+            // Aquamentus_Shoot makes the middle fireball first, then the lower one, then the upper.
+            ReadOnlySpan<int> yOffsets = [0, 1, -1];
+
             for (var i = 0; i < 3; i++)
             {
                 var slot = ShootFireball(ObjType.Fireball, X, Y);
                 if (slot < 0) break;
-                ReadOnlySpan<int> yOffsets = [1, 0, -1];
                 _fireballOffsets[(int)slot] = yOffsets[i];
             }
 
