@@ -292,18 +292,21 @@ internal abstract class Actor
         if (facing != Direction.None) return;
 
         var playerPos = Game.World.GetObservedPlayerPos();
-        // Why did the original game test these distances as unsigned?
-        var xDist = playerPos.X - x;
-        var yDist = playerPos.Y - y;
+
+        // InitWalker does these subtractions in 8 bits and compares the wrapped bytes, so a player
+        // who is up and to the left of the object produces large distances rather than negative
+        // ones. Comparing them as signed numbers flips the chosen axis in those cases.
+        var xDist = (byte)(playerPos.X - x);
+        var yDist = (byte)(playerPos.Y - y);
 
         if (xDist <= yDist)
         {
-            // Why is this away from the player, while for Y it's toward the player?
-            facing = playerPos.X > x ? Direction.Left : Direction.Right;
+            // Unlike the vertical case below, the original picks the direction *away* from the player here.
+            facing = playerPos.X >= x ? Direction.Left : Direction.Right;
         }
         else
         {
-            facing = playerPos.Y > y ? Direction.Down : Direction.Up;
+            facing = playerPos.Y >= y ? Direction.Down : Direction.Up;
         }
     }
 
