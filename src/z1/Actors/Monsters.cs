@@ -3972,7 +3972,11 @@ internal sealed class LamnolaActor : Actor
             var xDir = GetXDirToTruePlayer(X);
             var yDir = GetYDirToTruePlayer(Y);
 
-            dir = ((xDir & dirMask) == 0 || (xDir & Facing) == 0) ? yDir : xDir;
+            // The original tests the horizontal direction against the *player's* facing here
+            // ("BIT ObjDir" with no index, so object slot 0), not against the lamnola's own.
+            var playerFacing = Game.Link.Facing;
+
+            dir = ((xDir & dirMask) == 0 || (xDir & playerFacing) == 0) ? yDir : xDir;
         }
         else
         {
