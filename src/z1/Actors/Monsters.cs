@@ -1467,8 +1467,10 @@ internal sealed class ZolActor : WandererWalkerActor
 
     private void UpdateSplit()
     {
-        ReadOnlySpan<Direction> sHDirs = [Direction.Right, Direction.Left];
-        ReadOnlySpan<Direction> sVDirs = [Direction.Down, Direction.Up];
+        // UpdateZolState2_Split picks Left or Up for the first gel and derives the second with a
+        // shift right, giving Left then Right, or Up then Down.
+        ReadOnlySpan<Direction> sHDirs = [Direction.Left, Direction.Right];
+        ReadOnlySpan<Direction> sVDirs = [Direction.Up, Direction.Down];
 
         Delete();
         Game.World.RoomObjCount++;
