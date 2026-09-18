@@ -2203,9 +2203,6 @@ internal abstract class FlyingActor : Actor
 
     private void UpdateSlowing()
     {
-        // Flyer_SlowDown stops at the first speed whose high bits are clear and leaves it there,
-        // which is $1F -- the same value flyers are initialized with. Zeroing it instead would add
-        // another $20 frames of standing still before the flyer gets moving again.
         CurSpeed--;
         if ((CurSpeed & 0xE0) <= 0)
         {
@@ -2677,7 +2674,6 @@ internal sealed class PatraActor : FlyingActor
         Facing = Direction.Up;
         CurSpeed = 0x1F;
 
-        // InitPatra arms this timer, so the first maneuver runs for its full length.
         _childStateTimer = 0xFF;
 
         Game.Sound.PlayEffect(SoundEffect.BossRoar3, true, Sound.AmbientInstance);
@@ -3268,8 +3264,6 @@ internal sealed class BouldersActor : Actor
 
 internal sealed class TrapActor : Actor
 {
-    // TrapXs/TrapYs in the original. Object Y coordinates carry the usual -3 offset, so the low
-    // nibble is $D, not 0.
     private static readonly ImmutableArray<Point> _trapPos = [
         new Point(0x20, 0x5D),
         new Point(0x20, 0xBD),
@@ -3336,9 +3330,6 @@ internal sealed class TrapActor : Actor
         var distX = Math.Abs(playerX - X);
         var distY = Math.Abs(playerY - Y);
 
-        // The original only asks for the trap to be lined up on one axis; it puts no condition on
-        // the other. When the player is lined up horizontally but shares the trap's X, the
-        // horizontal test falls through to the vertical one instead of giving up.
         if (distY < 0xE && playerX != X)
         {
             dir = playerX < X ? Direction.Left : Direction.Right;
@@ -3979,8 +3970,6 @@ internal sealed class LamnolaActor : Actor
             var xDir = GetXDirToTruePlayer(X);
             var yDir = GetYDirToTruePlayer(Y);
 
-            // The original tests the horizontal direction against the *player's* facing here
-            // ("BIT ObjDir" with no index, so object slot 0), not against the lamnola's own.
             var playerFacing = Game.Link.Facing;
 
             dir = ((xDir & dirMask) == 0 || (xDir & playerFacing) == 0) ? yDir : xDir;

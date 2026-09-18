@@ -277,10 +277,6 @@ internal sealed unsafe partial class World
     private bool _giveFakePlayerPos;
     private Point _fakePlayerPos;
 
-    // The original updates the player's weapon and item slots in ascending order ($0D sword,
-    // $0E sword shot, $0F boomerang/food, $10 and $11 bomb-or-fire, $12 rod/arrow), and only then
-    // walks the monster and tile-object slots from $B down to 1. The slots that have no original
-    // counterpart keep their old descending position ahead of the weapons.
     private static readonly int[] _objectUpdateOrder = BuildObjectUpdateOrder();
 
     private readonly Actor?[] _objects = new Actor[(int)ObjectSlot.MaxObjects];
@@ -673,21 +669,13 @@ internal sealed unsafe partial class World
         return _tileMaps[_curTileMapIndex].AsRefs(row, col);
     }
 
-    /// <summary>
-    /// Looks up a play-area tile the way the original's column addressing does. Its buffer is
-    /// column-major with <see cref="Rows"/> bytes per column, so a row index past the end of one
-    /// column reads into the next: row 31 of column c is row 9 of column c + 1. Only a hotspot
-    /// outside the play area produces such a row, and no caller acts on the answer -- each pairs
-    /// the tile test with a room-bound check that rejects the direction regardless -- but reading
-    /// where the original reads beats substituting an answer of our own.
-    /// </summary>
+    // The original's play-area buffer is column-major, so an out-of-range row reads into the next column.
     private TileBehavior GetPlayAreaTileBehavior(int fineRow, int fineCol)
     {
         var index = fineCol * Rows + fineRow;
         var col = index / Rows;
         var row = index % Rows;
 
-        // The original runs off the end of its buffer here and reads whatever variables follow it.
         if (col >= Columns) return TileBehavior.GenericWalkable;
 
         return GetTileBehavior(row, col);
@@ -893,10 +881,6 @@ internal sealed unsafe partial class World
             }
         }
 
-        // GetCollidableTile subtracts the status bar height from an 8-bit Y, so a hotspot above the
-        // play area wraps rather than going negative: ($38 - $40) & $FF = $F8, >> 3 = row 31. That
-        // is reachable -- a monster spawned from the top edge of the screen starts at Y = $3D and
-        // can probe upward from there. See GetPlayAreaTileBehavior for where row 31 lands.
         var behavior = TileBehavior.FirstWalkable;
         var fineRow = (byte)((byte)(y - TileMapBaseY) / 8);
         var fineCol1 = (byte)(x / 8);

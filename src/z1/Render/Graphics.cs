@@ -23,7 +23,7 @@ internal enum TileSheet { Background, PlayerAndItems, Npcs, Boss, Font, Max }
 internal static class Graphics
 {
     private static GL? _gl;
-    private static Size? _windowSize;
+    private static GLFramebuffer? _framebuffer;
     private static readonly Size _viewportSize = new(256, 240);
 
     private static readonly int _paletteBmpWidth = Math.Max(Global.PaletteLength, 16);
@@ -58,21 +58,32 @@ internal static class Graphics
         _gl = gl;
         GLSpriteShader.Initialize(gl);
         GLVertexArray.Initialize(gl);
+        _framebuffer = new GLFramebuffer(gl, _viewportSize);
     }
 
+    // All game drawing happens at native resolution into an offscreen framebuffer. It is scaled to the
+    // window in a single step by EndRender.
     public static void StartRender()
     {
         ArgumentNullException.ThrowIfNull(_gl);
+        ArgumentNullException.ThrowIfNull(_framebuffer);
 
+        _framebuffer.Bind();
         _gl.ClearColor(0f, 0f, 0f, 1f);
         _gl.Clear((uint)(GLEnum.ColorBufferBit | GLEnum.DepthBufferBit));
 
         GLSpriteShader.Instance.SetViewport(_viewportSize.Width, _viewportSize.Height);
     }
 
-    public static void SetWindowSize(int width, int height)
+    public static void EndRender(Rectangle destination)
     {
-        _windowSize = new Size(width, height);
+        ArgumentNullException.ThrowIfNull(_gl);
+        ArgumentNullException.ThrowIfNull(_framebuffer);
+
+        _framebuffer.Unbind();
+        _gl.ClearColor(0f, 0f, 0f, 1f);
+        _gl.Clear((uint)(GLEnum.ColorBufferBit | GLEnum.DepthBufferBit));
+        _framebuffer.BlitToScreen(destination);
     }
 
     public static GLImage CreateImage(Asset asset)
@@ -313,7 +324,6 @@ internal static class Graphics
     public static UnclipScope SetClip(int x, int y, int width, int height)
     {
         ArgumentNullException.ThrowIfNull(_gl);
-        ArgumentNullException.ThrowIfNull(_windowSize);
 
         if (_clipped) throw new Exception();
         _clipped = true;
@@ -344,21 +354,16 @@ internal static class Graphics
             }
         }
 
-        var xratio = _windowSize.Value.Width / (float)_viewportSize.Width;
-        var yratio = _windowSize.Value.Height / (float)_viewportSize.Height;
-        var finalWidth = width * xratio;
-        var finalHeight = height * yratio;
-        var finalX = x * xratio;
-        var finalY = _windowSize.Value.Height - finalHeight - y * yratio;
+        // The scissor is in framebuffer coordinates, which have y = 0 at the bottom.
+        var flippedY = _viewportSize.Height - height - y;
         _gl.Enable(EnableCap.ScissorTest);
-        _gl.Scissor((int)finalX, (int)finalY, (uint)finalWidth, (uint)finalHeight);
+        _gl.Scissor(x, flippedY, (uint)width, (uint)height);
         return new UnclipScope();
     }
 
     public static void ResetClip()
     {
         ArgumentNullException.ThrowIfNull(_gl);
-        ArgumentNullException.ThrowIfNull(_windowSize);
 
         _gl.Disable(EnableCap.ScissorTest);
         _clipped = false;

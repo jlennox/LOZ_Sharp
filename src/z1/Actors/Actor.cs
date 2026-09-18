@@ -292,16 +292,11 @@ internal abstract class Actor
         if (facing != Direction.None) return;
 
         var playerPos = Game.World.GetObservedPlayerPos();
-
-        // InitWalker does these subtractions in 8 bits and compares the wrapped bytes, so a player
-        // who is up and to the left of the object produces large distances rather than negative
-        // ones. Comparing them as signed numbers flips the chosen axis in those cases.
         var xDist = (byte)(playerPos.X - x);
         var yDist = (byte)(playerPos.Y - y);
 
         if (xDist <= yDist)
         {
-            // Unlike the vertical case below, the original picks the direction *away* from the player here.
             facing = playerPos.X >= x ? Direction.Left : Direction.Right;
         }
         else
