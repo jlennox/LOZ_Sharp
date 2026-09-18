@@ -91,6 +91,14 @@ internal sealed class TileMap
 
         return (TileBehavior)_tileBehaviors[row * World.Columns + col];
     }
+
+    public byte AsRefs(int row, int col)
+    {
+        row = Math.Max(0, Math.Min(row, World.Rows - 1));
+        col = Math.Max(0, Math.Min(col, World.Columns - 1));
+
+        return _tileRefs[row * World.Columns + col];
+    }
 }
 
 internal sealed unsafe partial class World
@@ -624,6 +632,12 @@ internal sealed unsafe partial class World
     private TileBehavior GetTileBehavior(int row, int col)
     {
         return _tileMaps[_curTileMapIndex].AsBehaviors(row, col);
+    }
+
+    /// <summary>The raw tile number, for the few objects that classify obstacles by tile instead of behavior.</summary>
+    public byte GetTileRef(int row, int col)
+    {
+        return _tileMaps[_curTileMapIndex].AsRefs(row, col);
     }
 
     private TileBehavior GetTileBehaviorXY(int x, int y)

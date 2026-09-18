@@ -3579,19 +3579,24 @@ internal sealed class PolsVoiceActor : Actor
             if (!collision.Collides) return;
         }
 
-        if (World.CollidesWall(collision.TileBehavior))
-        {
-            Facing = Facing.GetOppositeDirection();
+        // UpdatePolsVoice classifies the blocking tile by number, not by behavior: it hops over
+        // blocks ($B0-$B3) and over water and the screen-edge bricks ($F4 and up), and reverses
+        // off everything else. Testing World.CollidesWall instead put tiles $F5/$F6 on the wrong
+        // side, since those extract as TileBehavior.Wall.
+        var tile = Game.World.GetTileRef(collision.FineRow, collision.FineCol);
 
-            if (Facing.IsHorizontal())
-            {
-                UpdateX();
-                UpdateX();
-            }
-        }
-        else
+        if ((tile & 0xFC) == 0xB0 || tile >= 0xF4)
         {
             SetupJump();
+            return;
+        }
+
+        Facing = Facing.GetOppositeDirection();
+
+        if (Facing.IsHorizontal())
+        {
+            UpdateX();
+            UpdateX();
         }
     }
 
