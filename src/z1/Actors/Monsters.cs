@@ -78,7 +78,8 @@ internal abstract class WalkerActor : Actor
     {
         if (!HasProjectile) return;
 
-        if (ObjType.IsBlueWalker() || ShootTimer != 0 || Random.Shared.Next(0xFF) >= 0xF8)
+        // _TryShooting compares a full random byte against $F8, so 8 values in 256 pass.
+        if (ObjType.IsBlueWalker() || ShootTimer != 0 || Random.Shared.GetByte() >= 0xF8)
         {
             if (InvincibilityTimer > 0)
             {
